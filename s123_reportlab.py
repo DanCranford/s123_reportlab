@@ -5,7 +5,7 @@ Created on Thu Aug  1 14:00:55 2019
 @author: dcraw
 """
 
-class s123_package():
+class feature_package():
     def __init__(self, layer, sql_query):
         self.main_fset = layer.query(sql_query)
         self.fields_main = self.main_fset.fields
@@ -32,23 +32,6 @@ class s123_package():
         return [info['DOWNLOAD_URL'] for info in self.att_res]
 
 
-#def canvas_it_up(att_data, pdf_path):
-#    from reportlab.pdfgen import canvas
-#    from reportlab.lib.pagesizes import letter
-#    
-#    canvas = canvas.Canvas(pdf_path, pagesize=letter)
-#    canvas.setLineWidth(.3)
-#    canvas.setFont('Helvetica', 12)
-#    
-#    x = 30
-#    y = 750
-#    
-#    for pair in att_data:
-#        canvas.drawString(x, y, str(pair[0]))
-#        canvas.drawString(x+100, y, str(pair[1]))
-#        y-=15
-#    
-#    canvas.save()
         
 def generic_feature_report(feature_object, output_file):
     import reportlab.platypus as platypus
@@ -58,9 +41,56 @@ def generic_feature_report(feature_object, output_file):
     doc = platypus.SimpleDocTemplate(output_file)
     style_sheet = getSampleStyleSheet()
     
+#    pge_img = platypus.Image('https://www.cecsb.org/wp-content/uploads/2013/05/PGE-LOGO-1024x259.png')
+#    elements.append(pge_img)
+    elements.append(platypus.Paragraph('FEATURE REPORT',style_sheet['Heading1']))
     
     table = platypus.Table(feature_object.build_field_order())
+    elements.append(table)
     
+    if feature_object.att_res:
+        for att in feature_object.att_res:
+            elements.append(platypus.Image(att['DOWNLOAD_URL']))
     doc.build(elements)
+    
+    return(output_file)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
