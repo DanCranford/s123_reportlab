@@ -85,8 +85,23 @@ class main_featpacker(base_featpacker):
         base_featpacker.__init__(self)
         self.relationships = []
         self.related_data = []
+        self.exclude_fields = []
     def __str__(self):
         return(str(self.attributes))
+        
+    def build_field_order(self, simplify = True):
+        att_alias = []
+        
+        if simplify:
+            list_fields = [field for field in list(self.fm_main.keys()) if field not in self.exclude_fields]
+        else:
+            list_fields = [field for field in list(self.fm_main.keys())]
+        for field in list_fields:
+            att_alias.append([self.fm_main[field],self.attributes[field]])
+        return att_alias
+    
+    def grab_att_links(self):
+        return [info['DOWNLOAD_URL'] for info in self.att_res]
         
 class related_set(object):
     def __init__(self):
@@ -94,6 +109,7 @@ class related_set(object):
         self.features = []
         self.has_attachments = False
         self.fields = []
+        self.exclude_fields = []
     
     def return_fset(self):
         try:
@@ -103,10 +119,14 @@ class related_set(object):
             return fset
         except:
             raise Exception ('You might not have the arcgis module')
-    def return_sdf(self):
+    def return_sdf(self, simplify = True):
         try:
             from arcgis.features import FeatureSet
-            return FeatureSet(self.features).sdf
+            if simplify:
+                out_fields = [field['name'] for field in self.fields if field['name'] not in self.exclude_fields]
+            else:
+                out_fields = [field['name'] for field in self.fields]
+            return FeatureSet(self.features).sdf[out_fields]
         except:
             raise Exception ('You might not have the arcgis module')
         
@@ -141,9 +161,13 @@ class Utils(object):
         if layer.properties.hasAttachments:
             temp_object.has_attachments = True
             temp_object.att_res = layer.attachments.search(sql_query)
-            
-        temp_object.layer_name = layer.properties.name
         
+        
+        temp_object.layer_name = layer.properties.name
+        if layer.container.properties.editorTrackingInfo['enableEditorTracking']:
+            temp_object.exclude_fields+=dict(layer.properties.editFieldsInfo).values()
+            temp_object.exclude_fields.append(layer.properties.objectIdField)
+            temp_object.exclude_fields.append(layer.properties.globalIdField)
         if len(layer.properties.relationships)>0:
             temp_object.has_related_tables = True
             temp_object.relationships = layer.properties.relationships
@@ -165,6 +189,13 @@ class Utils(object):
                 if templayer.properties.hasAttachments:
                     tempset.has_attachments=True
                 tempset.layer_name = templayer.properties.name
+                if layer.container.properties.editorTrackingInfo['enableEditorTracking']:
+                    tempset.exclude_fields+=dict(templayer.properties.editFieldsInfo).values()
+                tempset.exclude_fields.append(templayer.properties.objectIdField)
+                tempset.exclude_fields.append(templayer.properties.globalIdField)
+                if 'parentglobalid' in [field['name'] for field in tempset.fields]:
+                    tempset.exclude_fields.append('parentglobalid')
+                
                 temp_object.related_data.append(tempset)
         
         
@@ -175,14 +206,7 @@ class Utils(object):
         return temp_object
             
             
-    def build_field_order(self):
-        att_alias = []
-        for field in list(self.fm_main.keys()):
-            att_alias.append([self.fm_main[field],self.attributes[field]])
-        return att_alias
-    
-    def grab_att_links(self):
-        return [info['DOWNLOAD_URL'] for info in self.att_res]
+
 
 
 
