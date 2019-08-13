@@ -25,7 +25,7 @@ def attach_image_inline(msg_root, msg_template, url, tag, file_format='jpeg'):
     mime_img.add_header('Content-ID','<{}>'.format(tag))
     msg_root.attach(mime_img)
     
-    html_tag'''<br><b>{}</b><br><br><img src="cid:{}"><br>'''.format(tag,tag)
+    html_tag = '''<br><b>{}</b><br><br><img src="cid:{}"><br>'''.format(tag,tag)
     return msg_template + html_tag
 
 
