@@ -90,6 +90,7 @@ class main_featpacker(base_featpacker):
         return(str(self.attributes))
         
     def build_field_order(self, simplify = True):
+        from pandas import DataFrame
         att_alias = []
         
         if simplify:
@@ -98,7 +99,7 @@ class main_featpacker(base_featpacker):
             list_fields = [field for field in list(self.fm_main.keys())]
         for field in list_fields:
             att_alias.append([self.fm_main[field],self.attributes[field]])
-        return att_alias
+        return DataFrame(att_alias, columns = ['Field','Value'])
     
     def grab_att_links(self):
         return [info['DOWNLOAD_URL'] for info in self.att_res]

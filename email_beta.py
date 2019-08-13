@@ -20,10 +20,13 @@ def set_up_MIME_IMAGE(url, file_format):
     return MIMEImage(img_obj)
 
 def attach_image_inline(msg_root, msg_template, url, tag, file_format='jpeg'):
+    '''Sets up image attachment in email'''
     mime_img = set_up_MIME_IMAGE(url, file_format)
     mime_img.add_header('Content-ID','<{}>'.format(tag))
     msg_root.attach(mime_img)
-    return msg_template + '''<br><img src="cid:{}"><br>'''.format(tag)
+    
+    html_tag'''<br><b>{}</b><br><br><img src="cid:{}"><br>'''.format(tag,tag)
+    return msg_template + html_tag
 
 
 def add_table_to_template(template, df, table_title):
