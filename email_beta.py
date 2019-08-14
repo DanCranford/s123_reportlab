@@ -40,20 +40,20 @@ def add_table_to_template(template, df, table_title):
     return template+html
 
     
-def survey123_to_email(layer, query_field, query_value, display_field, email_field):
+def survey123_to_email(feat_ob, display_field, email_field):
     from email.mime.text import MIMEText
     from email.mime.multipart import MIMEMultipart
     from jinja2 import Environment
     
     mp_msg = MIMEMultipart()
-    query = "{} = '{}'".format(query_field,query_value)
-    feat_ob = Utils.from_layer(layer, query)
+#    query = "{} = '{}'".format(query_field,query_value)
+#    feat_ob = Utils.from_layer(layer, query)
 
     TEMPLATE="""
     <!DOCTYPE html>
     <html>
     <head>
-    <title>{}</title>
+    <title>Survey Report</title>
       <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
       <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
       <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
@@ -69,21 +69,24 @@ def survey123_to_email(layer, query_field, query_value, display_field, email_fie
     }
       </style>
     
+    """
+    
+    TEMPLATE+="""
     </head>
     <body>
         <h1>{}</h1>
         <p>{}</p>
-    
-    """.format("Survey Report",layer.properties.name, feat_ob.attributes[display_field])
+    """.format(feat_ob.layer_name, feat_ob.attributes[display_field])
     
     TEMPLATE = add_table_to_template(TEMPLATE, feat_ob.build_field_order(), 'Main Feature')
     
-    for att in feat_ob.att_res:
-        TEMPLATE = attach_image_inline(mp_msg, TEMPLATE, att['DOWNLOAD_URL'], att['KEYWORDS'],'jpeg')
-    
-    for rel_data in feat_ob.related_data:
-        TEMPLATE = add_table_to_template(TEMPLATE, rel_data.return_sdf(), rel_data.layer_name)
-    
+    if(feat_ob.att_res):
+        for att in feat_ob.att_res:
+            TEMPLATE = attach_image_inline(mp_msg, TEMPLATE, att['DOWNLOAD_URL'], att['KEYWORDS'],'jpeg')
+    if(feat_ob.related_data):    
+        for rel_data in feat_ob.related_data:
+            TEMPLATE = add_table_to_template(TEMPLATE, rel_data.return_sdf(), rel_data.layer_name)
+        
     TEMPLATE +="""</body>
                 </html>
                 """     
@@ -156,28 +159,30 @@ receiver=['dpcn@pge.com'
 #
 #mp_msg.attach(mst_template)
 
-    
-mp_msg['Subject'] = "Survey Report Test"
-mp_msg['To'] = ', '.join(receiver)
-mp_msg['From'] = 'dpcn@pge.com'
-
-#mp_msg.attach(mp_visible)
-
-#set SMTP
-server=smtplib.SMTP('mailhost',25)
-server.login
-
-#set sender and reciever
-
-
-
-#send email
-
-server.sendmail(sender,receiver,mp_msg.as_string())
-
-
-server.quit()
-
+#import smtplib
+#sender="dpcn@pge.com"
+#receiver=['dpcn@pge.com'
+#          ]
+#mp_msg['Subject'] = "Survey Report"
+#mp_msg['To'] = ', '.join(receiver)
+#mp_msg['From'] = 'donotreply@pge.com'
+#
+##mp_msg.attach(mp_visible)
+#
+##set SMTP
+#server=smtplib.SMTP('mailhost',25)
+#server.login
+#
+##set sender and reciever
+#
+#
+#
+##send email
+#
+#server.sendmail(sender,receiver,mp_msg.as_string())
+#
+#
+#server.quit()
 
 
 
