@@ -28,17 +28,6 @@ def generic_feature_report(feature_object, output_file):
     
     return(output_file)
 
-
-
-
-
-
-
-
-
-
-
-
 class base_featpacker(object):
     def __init__(self):
         self.main_fset = None
@@ -178,38 +167,3 @@ class Utils(object):
         
         
         return temp_object
-            
-            
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

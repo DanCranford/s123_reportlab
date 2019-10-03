@@ -4,6 +4,18 @@ Created on Fri Aug  9 14:46:07 2019
 
 @author: dpcn
 """
+
+
+def get_file_format(content_type):
+    temp_dict = {'image/jpeg': 'jpeg',
+                 'image/png': 'png'}
+    try:
+        return temp_dict[content_type]
+    except KeyError:
+        return content_type.replace('image/', '')
+
+
+
 def set_up_MIME_IMAGE(url, file_format):
     from io import BytesIO
     from requests import get as requestsget
@@ -83,7 +95,8 @@ def survey123_to_email(feat_ob, display_field, email_field):
     
     if(feat_ob.att_res):
         for att in feat_ob.att_res:
-            TEMPLATE = attach_image_inline(mp_msg, TEMPLATE, att['DOWNLOAD_URL'], att['KEYWORDS'],'jpeg')
+            TEMPLATE = attach_image_inline(mp_msg, TEMPLATE, att['DOWNLOAD_URL'], att['KEYWORDS'],
+                                           get_file_format(att['CONTENTTYPE']))
     if(feat_ob.related_data):    
         for rel_data in feat_ob.related_data:
             TEMPLATE = add_table_to_template(TEMPLATE, rel_data.return_sdf(), rel_data.layer_name)
