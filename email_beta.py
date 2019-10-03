@@ -8,7 +8,8 @@ Created on Fri Aug  9 14:46:07 2019
 
 def get_file_format(content_type):
     temp_dict = {'image/jpeg': 'jpeg',
-                 'image/png': 'png'}
+                 'image/png': 'png',
+                 'application/octet-stream': 'pdf'}
     try:
         return temp_dict[content_type]
     except KeyError:
