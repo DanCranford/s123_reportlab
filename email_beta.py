@@ -30,7 +30,8 @@ def attach_image_inline(msg_root, msg_template, url, tag, file_format='jpeg'):
 
 
 def add_table_to_template(template, df, table_title):
-    formatted_df = df.to_html(border=1,index=False,classes='table width="800" cellpadding="5" cellspacing="0" style="border-collapse:collapse;text-align:center;"')
+    formatted_df = df.to_html().replace('<th>','<th style = "background-color: #777;border: 1px solid #ddd;padding: 8px;">')\
+                           .replace('\n', '').replace('<table border="1" class="dataframe">','	<table border="1" align="center" width=80% class="dataframe" style="border-collapse:collapse; position: relative; padding:15px; background-color:#fff">').replace('<td>', '<td style ="border: 1px solid #ddd;padding: 8px;">')
     
     html = """  <br>
                 <h3><b>{}</b></h3>
