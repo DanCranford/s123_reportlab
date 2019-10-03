@@ -4,6 +4,19 @@ Created on Fri Aug  9 14:46:07 2019
 
 @author: dpcn
 """
+def attachment_to_email(attachment_res):
+    from io import BytesIO
+    from email.mime.base import MIMEBase
+    from email.encoders import encode_base64
+    from requests import get as requestsget
+
+    temp_bytes = BytesIO(requestsget(attachment_res['DOWNLOAD_URL']).content)
+    p = MIMEBase('application','octet-stream')
+    p.set_payload(temp_bytes.read())
+    encode_base64(p)
+    filename = attachment_res['NAME']
+    p.add_header('Content-Disposition','attachment; filename= %s' %filename)
+    return p
 
 
 def get_file_format(content_type):
@@ -96,8 +109,10 @@ def survey123_to_email(feat_ob, display_field, email_field):
     
     if(feat_ob.att_res):
         for att in feat_ob.att_res:
-            TEMPLATE = attach_image_inline(mp_msg, TEMPLATE, att['DOWNLOAD_URL'], att['KEYWORDS'],
-                                           get_file_format(att['CONTENTTYPE']))
+            if 'image' in att['CONTENTTYPE']:
+                TEMPLATE = attach_image_inline(mp_msg, TEMPLATE, att['DOWNLOAD_URL'], att['KEYWORDS'],
+                                               get_file_format(att['CONTENTTYPE']))
+
     if(feat_ob.related_data):    
         for rel_data in feat_ob.related_data:
             TEMPLATE = add_table_to_template(TEMPLATE, rel_data.return_sdf(), rel_data.layer_name)
